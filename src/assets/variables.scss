@@ -1,0 +1,83 @@
+@use "sass:math";
+@function parseInt($n) {
+  /* 2 */
+  @return math.div($n, ($n * 0 + 1));
+}
+@mixin rem($property, $values) {
+  $px: (); /* 3 */
+  $rem: (); /* 3 */
+
+  @each $value in $values {
+    /* 4 */
+
+    @if $value == 0 or $value == auto {
+      /* 5 */
+      $px: append($px, $value);
+      $rem: append($rem, $value);
+    } @else {
+      $unit: unit($value); /* 6 */
+      $val: parseInt($value); /* 6 */
+
+      @if $unit == 'px' {
+        /* 7 */
+        $px: append($px, $value);
+        //$rem: append($rem, ($val / 16 + rem));
+        $rem: append($rem, ( math.div($val,16) + rem));
+      }
+
+      @if $unit == 'rem' {
+        /* 7 */
+        $px: append($px, ($val * 16 + px));
+        $rem: append($rem, $value);
+      }
+    }
+  }
+
+  @if $px == $rem {
+    /* 8 */
+    #{$property}: $px; /* 9 */
+  } @else {
+    #{$property}: $px; /* 9 */
+    #{$property}: $rem; /* 9 */
+  }
+}
+.texts14 {
+  @include rem(font-size,14px);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+.texts12 {
+  @include rem(font-size,12px);
+  display: flex;
+  align-items: center;
+}
+.texts10 {
+  @include rem(font-size,10px);
+}
+.texts24 {
+  @include rem(font-size,24px);
+  font-weight: 700;
+  line-height: 28px;
+}
+.texts18 {
+  @include rem(font-size,18px);
+  line-height: 25px;
+}
+@media screen and (max-width: 650px) {
+  .texts10 {
+    font-size: 10px;
+  }
+  .texts12 {
+    font-size: 12px;
+  }
+  .texts14 {
+    font-size: 14px;
+  }
+  .texts18 {
+    font-size: 18px;
+  }
+  .texts24 {
+    font-size: 24px;
+  }
+}
