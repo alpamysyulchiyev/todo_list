@@ -6,10 +6,14 @@
       <p class="texts18">TODO list</p>
     </div>
     <div
+        v-if="!is_edit_group"
         class="button"
         @click="todo_store.addTask()"
     >
       Добавить
+    </div>
+    <div v-else class="button error-btn" @click="todo_store.deleteGroup">
+      Удалить список
     </div>
   </div>
 </header>
@@ -19,6 +23,7 @@
 import {useToDoListStore} from "@/stores/tasks";
 import {storeToRefs} from "pinia";
 const todo_store = useToDoListStore()
+let {is_edit_group} = storeToRefs(todo_store)
 </script>
 
 <style lang="scss">

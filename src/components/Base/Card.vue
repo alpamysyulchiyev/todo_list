@@ -1,11 +1,13 @@
 <template>
   <div class="todo-card" v-click-outside="() => modelValue.is_edit = false">
-    <div class="todo-card__header">
+  <div class="todo-card__header" :class="{'done':modelValue.is_done}">
+    <input v-if="is_edit_group" v-model="selected" type="checkbox">
       <div class="todo-card__title">
 
         <BaseInput
-            v-if="modelValue.is_edit"
+            v-if="modelValue.is_edit && !is_edit_group"
             v-model="modelValue.title"
+            @keyup.enter="modelValue.is_edit = false"
             placeholder="введите заголовок"
         />
 
@@ -37,41 +39,45 @@
           </div>
       </div>
       <button @click="addChild" class="button">Добавить карточку</button>
-
-<!--      <button-->
-<!--          v-if="modelValue.isEdit"-->
-<!--          @click="modelValue.isEdit = false"-->
-<!--          class="button"-->
-<!--      >-->
-<!--        Сохранить-->
-<!--      </button>-->
     </div>
 
       <div v-show="isPopover" class="popover">
-        <p>Пометить как выполненное</p>
+        <p @click="modelValue.is_done = !modelValue.is_done">
+          Пометить как {{modelValue.is_done ? 'невыполненное' : 'выполненное'}}
+        </p>
         <p @click="todoStore.deleteTask(modelValue.id)">Удалить</p>
         <p @click="editCard()">Редактировать</p>
-        <p>Выбрать</p>
+        <p @click="selectGroup">Выбрать</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import {ref} from 'vue'
+import {ref, watch} from 'vue'
 import {useToDoListStore} from "@/stores/tasks";
 import BaseInput from '@/components/Base/Input.vue'
-const msg = ref('alpa')
+import {storeToRefs} from "pinia";
 const props = defineProps({
   modelValue: Object,
 })
-const emits = defineEmits(['update:modelValue'])
+const emits = defineEmits(['update:modelValue', 'selectCard'])
 
 
 let todoStore = useToDoListStore()
+let { is_edit_group } = storeToRefs(todoStore)
 const isPopover = ref(false)
 
+let selected = ref(false)
+watch(selected, () => {
+  emits('selectCard', props.modelValue.id)
+})
+const selectGroup = () => {
+  selected.value = true
+  is_edit_group.value = true
+}
 function editCard () {
   props.modelValue.is_edit = true
+  props.modelValue.is_done = false
   isPopover.value = false
 }
 function closePopover() {
@@ -105,12 +111,15 @@ const addChild = () => {
     border-bottom: 1px solid white;
     padding: 20px;
     flex-grow: 1;
+
   }
 
   &__title {
     min-height: 29.3px;
     display: flex;
     flex-grow: 1;
+    overflow: hidden;
+
     p {
       padding: 4px;
       font-size: 16px;
@@ -124,6 +133,7 @@ const addChild = () => {
     flex-direction: column;
     gap:15px;
 
+
   }
 
   &__subtask {
@@ -133,6 +143,11 @@ const addChild = () => {
       padding: 5px;
       border: 1px solid #d2d1d1;
       border-radius: 2px;
+
+      p {
+        overflow: hidden;
+
+      }
 
       img {
         cursor: pointer;
@@ -158,6 +173,10 @@ const addChild = () => {
          background-color: #e3e2e2;
        }
      }
+  }
+
+  .done {
+    background-color: #17d917;
   }
 
 }

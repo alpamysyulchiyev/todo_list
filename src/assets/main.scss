@@ -111,3 +111,15 @@ h6 {
     }
 }
 
+.error-btn {
+    background-color: red;
+
+    &:hover {
+        background-color: #e00404;
+    }
+
+    &:active {
+        background-color: #a40202;
+    }
+}
+
